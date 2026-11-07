@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Testcontainers.Oracle" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\KvkkInventory.Core\KvkkInventory.Core.csproj" />
+    <ProjectReference Include="..\..\src\KvkkInventory.Synthetic\KvkkInventory.Synthetic.csproj" />
+    <ProjectReference Include="..\..\src\KvkkInventory.Postgres\KvkkInventory.Postgres.csproj" />
+    <ProjectReference Include="..\..\src\KvkkInventory.Oracle\KvkkInventory.Oracle.csproj" />
+  </ItemGroup>
+
+</Project>
