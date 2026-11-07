@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/KvkkInventory.Core/KvkkInventory.Core.csproj" />
+    <Project Path="src/KvkkInventory.Postgres/KvkkInventory.Postgres.csproj" />
+    <Project Path="src/KvkkInventory.Oracle/KvkkInventory.Oracle.csproj" />
+    <Project Path="src/KvkkInventory.Synthetic/KvkkInventory.Synthetic.csproj" />
+    <Project Path="src/KvkkInventory.Cli/KvkkInventory.Cli.csproj" />
+    <Project Path="src/KvkkInventory.Api/KvkkInventory.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/KvkkInventory.UnitTests/KvkkInventory.UnitTests.csproj" />
+    <Project Path="tests/KvkkInventory.IntegrationTests/KvkkInventory.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/KvkkInventory.Benchmarks/KvkkInventory.Benchmarks.csproj" />
+  </Folder>
+</Solution>
