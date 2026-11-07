@@ -124,28 +124,28 @@ public sealed class Masker
         switch (type)
         {
             case PiiType.NationalId:
-            {
-                Span<char> nine = stackalloc char[9];
-                nine[0] = prf.NonZeroDigit();
-                for (var i = 1; i < 9; i++)
                 {
-                    nine[i] = prf.Digit();
-                }
+                    Span<char> nine = stackalloc char[9];
+                    nine[0] = prf.NonZeroDigit();
+                    for (var i = 1; i < 9; i++)
+                    {
+                        nine[i] = prf.Digit();
+                    }
 
-                var (d10, d11) = Checksums.TcknCheckDigits(nine);
-                return string.Concat(nine, ((char)('0' + d10)).ToString(), ((char)('0' + d11)).ToString());
-            }
+                    var (d10, d11) = Checksums.TcknCheckDigits(nine);
+                    return string.Concat(nine, ((char)('0' + d10)).ToString(), ((char)('0' + d11)).ToString());
+                }
 
             case PiiType.TaxId:
-            {
-                Span<char> nine = stackalloc char[9];
-                for (var i = 0; i < 9; i++)
                 {
-                    nine[i] = prf.Digit();
-                }
+                    Span<char> nine = stackalloc char[9];
+                    for (var i = 0; i < 9; i++)
+                    {
+                        nine[i] = prf.Digit();
+                    }
 
-                return string.Concat(nine, ((char)('0' + Checksums.VknCheckDigit(nine))).ToString());
-            }
+                    return string.Concat(nine, ((char)('0' + Checksums.VknCheckDigit(nine))).ToString());
+                }
 
             case PiiType.Iban:
                 return MaskIban(value, prf);
@@ -154,41 +154,41 @@ public sealed class Masker
                 return MaskCard(value, prf, keepLast4: false);
 
             case PiiType.Phone:
-            {
-                // Keep the shape and the first three national digits (operator / area code); replace the subscriber number.
-                var digitCount = value.Count(char.IsAsciiDigit);
-                var keep = Math.Max(0, digitCount - 7);
-                return ReplaceDigits(value, prf, keep);
-            }
+                {
+                    // Keep the shape and the first three national digits (operator / area code); replace the subscriber number.
+                    var digitCount = value.Count(char.IsAsciiDigit);
+                    var keep = Math.Max(0, digitCount - 7);
+                    return ReplaceDigits(value, prf, keep);
+                }
 
             case PiiType.Email:
-            {
-                var at = value.IndexOf('@', StringComparison.Ordinal);
-                var localLength = Math.Clamp(at > 0 ? at : 8, 6, 16);
-                var local = new StringBuilder(localLength);
-                for (var i = 0; i < localLength; i++)
                 {
-                    local.Append(prf.Letter(i == 0 ? LowerLetters : LowerLetters + "0123456789"));
-                }
+                    var at = value.IndexOf('@', StringComparison.Ordinal);
+                    var localLength = Math.Clamp(at > 0 ? at : 8, 6, 16);
+                    var local = new StringBuilder(localLength);
+                    for (var i = 0; i < localLength; i++)
+                    {
+                        local.Append(prf.Letter(i == 0 ? LowerLetters : LowerLetters + "0123456789"));
+                    }
 
-                // RFC 2606 reserved domain: masked addresses can never deliver mail to a real mailbox.
-                return local + "@example.invalid";
-            }
+                    // RFC 2606 reserved domain: masked addresses can never deliver mail to a real mailbox.
+                    return local + "@example.invalid";
+                }
 
             case PiiType.VehiclePlate:
-            {
-                var builder = new StringBuilder(value.Length);
-                for (var i = 0; i < value.Length; i++)
                 {
-                    var ch = value[i];
-                    builder.Append(i < 2 && char.IsAsciiDigit(ch) ? ch
-                        : char.IsAsciiDigit(ch) ? prf.Digit()
-                        : char.IsLetter(ch) ? prf.Letter(PlateLetters)
-                        : ch);
-                }
+                    var builder = new StringBuilder(value.Length);
+                    for (var i = 0; i < value.Length; i++)
+                    {
+                        var ch = value[i];
+                        builder.Append(i < 2 && char.IsAsciiDigit(ch) ? ch
+                            : char.IsAsciiDigit(ch) ? prf.Digit()
+                            : char.IsLetter(ch) ? prf.Letter(PlateLetters)
+                            : ch);
+                    }
 
-                return builder.ToString();
-            }
+                    return builder.ToString();
+                }
 
             default:
                 return PreserveCharacterClasses(value, prf);
@@ -241,18 +241,18 @@ public sealed class Masker
                 return value[..value.LastIndexOf('.')] + ".0";
 
             case PiiType.IpAddress when value.Contains(':', StringComparison.Ordinal) && System.Net.IPAddress.TryParse(value, out var ip):
-            {
-                var bytes = ip.GetAddressBytes();
-                Array.Clear(bytes, 6, bytes.Length - 6); // keep the /48 routing prefix
-                return new System.Net.IPAddress(bytes).ToString();
-            }
+                {
+                    var bytes = ip.GetAddressBytes();
+                    Array.Clear(bytes, 6, bytes.Length - 6); // keep the /48 routing prefix
+                    return new System.Net.IPAddress(bytes).ToString();
+                }
 
             case PiiType.Address:
-            {
-                var folded = TurkishText.Fold(value);
-                var province = Provinces.LastOrDefault(p => folded.Contains(p, StringComparison.Ordinal));
-                return province is null ? "***" : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(province);
-            }
+                {
+                    var folded = TurkishText.Fold(value);
+                    var province = Provinces.LastOrDefault(p => folded.Contains(p, StringComparison.Ordinal));
+                    return province is null ? "***" : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(province);
+                }
 
             case PiiType.Salary when decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount):
                 return (Math.Floor(amount / 5000m) * 5000m).ToString("0", CultureInfo.InvariantCulture);
@@ -268,24 +268,24 @@ public sealed class Masker
         switch (type)
         {
             case PiiType.PersonName:
-            {
-                var words = value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
-                // A single word is a first name or a surname (separate ad / soyad columns); keep which one it was.
-                var single = Lexicons.Surnames.Contains(TurkishText.Fold(value.Trim())) ? Surnames : FirstNames;
-                var name = words <= 1
-                    ? Capitalise(single[prf.Next(single.Length)])
-                    : Capitalise(FirstNames[prf.Next(FirstNames.Length)]) + " " + Capitalise(Surnames[prf.Next(Surnames.Length)]);
-                return value.Any(char.IsLower) ? name : name.ToUpperInvariant();
-            }
+                {
+                    var words = value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+                    // A single word is a first name or a surname (separate ad / soyad columns); keep which one it was.
+                    var single = Lexicons.Surnames.Contains(TurkishText.Fold(value.Trim())) ? Surnames : FirstNames;
+                    var name = words <= 1
+                        ? Capitalise(single[prf.Next(single.Length)])
+                        : Capitalise(FirstNames[prf.Next(FirstNames.Length)]) + " " + Capitalise(Surnames[prf.Next(Surnames.Length)]);
+                    return value.Any(char.IsLower) ? name : name.ToUpperInvariant();
+                }
 
             case PiiType.Address:
-            {
-                var street = Streets[prf.Next(Streets.Length)];
-                var neighbourhood = Streets[prf.Next(Streets.Length)];
-                var number = prf.Next(200) + 1;
-                var province = Capitalise(Provinces[prf.Next(Provinces.Length)]);
-                return string.Create(CultureInfo.InvariantCulture, $"{neighbourhood} Mah. {street} Sok. No:{number} {province}");
-            }
+                {
+                    var street = Streets[prf.Next(Streets.Length)];
+                    var neighbourhood = Streets[prf.Next(Streets.Length)];
+                    var number = prf.Next(200) + 1;
+                    var province = Capitalise(Provinces[prf.Next(Provinces.Length)]);
+                    return string.Create(CultureInfo.InvariantCulture, $"{neighbourhood} Mah. {street} Sok. No:{number} {province}");
+                }
 
             default:
                 return FormatPreserving(value, type);
