@@ -13,9 +13,9 @@ x-image: &image
     dockerfile: Dockerfile
 
 x-pg-env: &pg-env
-  KVKK_OWNER_CONNECTION: Host=postgres;Database=kvkk;Username=clinic_owner;Password=${OWNER_PASSWORD:-OwnerDev1}
-  KVKK_SCANNER_CONNECTION: Host=postgres;Database=kvkk;Username=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
-  KVKK_MASKER_CONNECTION: Host=postgres;Database=kvkk;Username=kvkk_masker;Password=${MASKER_PASSWORD:-MaskerDev1}
+  KVKK_OWNER_CONNECTION: Host=postgres;Database=kvkk;Username=clinic_owner;Password=${OWNER_PASSWORD:-OwnerDev1};GSS Encryption Mode=Disable
+  KVKK_SCANNER_CONNECTION: Host=postgres;Database=kvkk;Username=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1};GSS Encryption Mode=Disable
+  KVKK_MASKER_CONNECTION: Host=postgres;Database=kvkk;Username=kvkk_masker;Password=${MASKER_PASSWORD:-MaskerDev1};GSS Encryption Mode=Disable
 
 x-ora-env: &ora-env
   KVKK_OWNER_CONNECTION: Data Source=oracle:1521/FREEPDB1;User Id=clinic;Password=${OWNER_PASSWORD:-OwnerDev1}
@@ -94,7 +94,7 @@ services:
     ports:
       - "127.0.0.1:${API_PORT:-18433}:8080"
     environment:
-      ConnectionStrings__Postgres: Host=postgres;Database=kvkk;Username=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
+      ConnectionStrings__Postgres: Host=postgres;Database=kvkk;Username=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1};GSS Encryption Mode=Disable
       ConnectionStrings__Oracle: Data Source=oracle:1521/FREEPDB1;User Id=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
       OpenApi__Enabled: "true"
       OTEL_SERVICE_NAME: kvkk-data-inventory-api

@@ -1,0 +1,154 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build-test:
+    name: build & test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore
+
+      # Package versions are pinned and updated by hand, so a known vulnerability in any direct or
+      # transitive package fails the build. Fix it with a pinned upgrade in Directory.Packages.props.
+      - name: Audit for vulnerable packages
+        run: |
+          set -o pipefail
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::error::Known-vulnerable NuGet packages found (see the list above)"
+            exit 1
+          fi
+
+      - name: Format check
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build (warnings are errors)
+        run: dotnet build --no-restore --configuration Release
+
+      # Integration tests start postgres:17-alpine and gvenzl/oracle-free:23-slim-faststart through Testcontainers.
+      # No --coverage-output: each test project then writes a uniquely named file instead of overwriting one.
+      - name: Test
+        run: >
+          dotnet test --no-build --configuration Release
+          --coverage --coverage-output-format cobertura
+          --results-directory "${{ github.workspace }}/TestResults"
+
+      - name: Coverage summary
+        if: always()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.12
+        with:
+          reports: TestResults/**/*.cobertura.xml
+          targetdir: coverage
+          reporttypes: MarkdownSummaryGithub
+          assemblyfilters: "-*Tests*"
+          filefilters: "-*/obj/*"
+
+      - name: Publish coverage to job summary
+        if: always()
+        run: |
+          if [ -f coverage/SummaryGithub.md ]; then
+            cat coverage/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No coverage report produced."
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 7
+
+  container:
+    name: container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          load: true
+          tags: kvkk-data-inventory:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify the image runs as non-root
+        run: |
+          user=$(docker image inspect kvkk-data-inventory:ci --format '{{.Config.User}}')
+          echo "Configured user: ${user}"
+          test -n "${user}" && test "${user}" != "0" && test "${user}" != "root"
+
+  compose-demo:
+    name: docker compose demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      # The README promises `docker compose up` runs the whole demo with zero manual steps; this job keeps it true.
+      - name: Start the stack
+        run: docker compose up -d --build
+
+      - name: Wait for both pipelines and the API
+        run: |
+          test "$(docker wait kvkk-data-inventory-demo-postgres-1)" = "0" || { docker compose logs demo-postgres; exit 1; }
+          test "$(docker wait kvkk-data-inventory-demo-oracle-1)" = "0" || { docker compose logs demo-oracle; exit 1; }
+          docker compose logs demo-postgres demo-oracle | tee pipelines.log
+          grep -q "PIPELINE_OK postgres" pipelines.log
+          grep -q "PIPELINE_OK oracle" pipelines.log
+          for i in $(seq 1 60); do
+            curl -fsS http://localhost:18433/health/ready && break
+            sleep 2
+          done
+          curl -fsS http://localhost:18433/health/ready
+
+      - name: Scan both databases through the API with the read-only accounts
+        run: |
+          for db in postgres:clinic oracle:CLINIC; do
+            curl -fsS -X POST http://localhost:18433/api/v1/scans -H 'Content-Type: application/json' \
+              -d "{\"database\":\"${db%%:*}\",\"schema\":\"${db##*:}\"}" > "scan-${db%%:*}.json"
+            grep -q '"type": *"NationalId"\|"type":"NationalId"' "scan-${db%%:*}.json"
+          done
+          curl -fsS -X POST http://localhost:18433/api/v1/inventory -H 'Content-Type: application/json' \
+            -d '{"database":"oracle","schema":"CLINIC"}' | grep -q 'Sağlık Bilgileri'
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
