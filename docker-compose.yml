@@ -1,0 +1,114 @@
+# `docker compose up` runs the whole demo with zero manual steps:
+#   postgres / oracle   → PostgreSQL 17 and Oracle 23ai Free; deploy/*/init creates owner, scanner and masker accounts
+#   demo-postgres       → `kvkk pipeline`: seed synthetic clinic + HR schema (owner), scan + classify (read-only
+#   demo-oracle           scanner), VERBİS export + accuracy vs ground truth, masked copy (masker); exits 0
+#   api                 → scan / inventory / detect API over both databases with the scanner accounts
+# Then: http://localhost:18433/scalar ; results: docker compose cp demo-postgres:/out ./out  (all data synthetic)
+name: kvkk-data-inventory
+
+x-image: &image
+  image: kvkk-data-inventory:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+x-pg-env: &pg-env
+  KVKK_OWNER_CONNECTION: Host=postgres;Database=kvkk;Username=clinic_owner;Password=${OWNER_PASSWORD:-OwnerDev1}
+  KVKK_SCANNER_CONNECTION: Host=postgres;Database=kvkk;Username=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
+  KVKK_MASKER_CONNECTION: Host=postgres;Database=kvkk;Username=kvkk_masker;Password=${MASKER_PASSWORD:-MaskerDev1}
+
+x-ora-env: &ora-env
+  KVKK_OWNER_CONNECTION: Data Source=oracle:1521/FREEPDB1;User Id=clinic;Password=${OWNER_PASSWORD:-OwnerDev1}
+  KVKK_SCANNER_CONNECTION: Data Source=oracle:1521/FREEPDB1;User Id=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
+  KVKK_MASKER_CONNECTION: Data Source=oracle:1521/FREEPDB1;User Id=kvkk_masked;Password=${MASKER_PASSWORD:-MaskerDev1}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: kvkk
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres-dev-only}
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-OwnerDev1}
+      SCANNER_PASSWORD: ${SCANNER_PASSWORD:-ScannerDev1}
+      MASKER_PASSWORD: ${MASKER_PASSWORD:-MaskerDev1}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-25433}:5432"
+    volumes:
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kvkk"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-sys-dev-only}
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-OwnerDev1}
+      SCANNER_PASSWORD: ${SCANNER_PASSWORD:-ScannerDev1}
+      MASKER_PASSWORD: ${MASKER_PASSWORD:-MaskerDev1}
+    ports:
+      - "127.0.0.1:${ORACLE_PORT:-25521}:1521"
+    volumes:
+      - ./deploy/oracle/init:/container-entrypoint-initdb.d:ro
+      - oradata:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  demo-postgres:
+    <<: *image
+    entrypoint: ["dotnet", "/app/cli/kvkk.dll"]
+    command: ["pipeline", "--db", "postgres", "--schema", "clinic", "--target", "clinic_masked", "--out", "/out", "--policy", "/app/samples/inventory-policy.json"]
+    environment:
+      <<: *pg-env
+      KVKK_MASKING_KEY: ${KVKK_MASKING_KEY:-Y29tcG9zZS1kZW1vLWtleS1ub3QtZm9yLXJlYWwtZGF0YQ==}
+    volumes:
+      - out-postgres:/out
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  demo-oracle:
+    <<: *image
+    entrypoint: ["dotnet", "/app/cli/kvkk.dll"]
+    command: ["pipeline", "--db", "oracle", "--schema", "CLINIC", "--target", "KVKK_MASKED", "--out", "/out", "--policy", "/app/samples/inventory-policy.json"]
+    environment:
+      <<: *ora-env
+      KVKK_MASKING_KEY: ${KVKK_MASKING_KEY:-Y29tcG9zZS1kZW1vLWtleS1ub3QtZm9yLXJlYWwtZGF0YQ==}
+    volumes:
+      - out-oracle:/out
+    depends_on:
+      oracle:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    <<: *image
+    ports:
+      - "127.0.0.1:${API_PORT:-18433}:8080"
+    environment:
+      ConnectionStrings__Postgres: Host=postgres;Database=kvkk;Username=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
+      ConnectionStrings__Oracle: Data Source=oracle:1521/FREEPDB1;User Id=kvkk_scanner;Password=${SCANNER_PASSWORD:-ScannerDev1}
+      OpenApi__Enabled: "true"
+      OTEL_SERVICE_NAME: kvkk-data-inventory-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    depends_on:
+      demo-postgres:
+        condition: service_completed_successfully
+      demo-oracle:
+        condition: service_completed_successfully
+    # No container HEALTHCHECK: the chiseled image has no shell or curl; probe /health/live and /health/ready.
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  oradata:
+  out-postgres:
+  out-oracle:
