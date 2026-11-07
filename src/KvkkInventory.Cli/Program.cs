@@ -27,6 +27,7 @@ try
         "export" => Export(options),
         "evaluate" => Evaluate(options),
         "demo" => await DemoAsync(options),
+        "pipeline" => await PipelineAsync(options),
         _ => Usage(),
     };
 }
@@ -168,6 +169,45 @@ static async Task<int> DemoAsync(Options o)
     return 0;
 }
 
+// The docker compose demo in one process (the chiseled image has no shell to chain commands): seed as the owner,
+// scan + classify as the read-only scanner, export, evaluate, then mask as the masking account. Each step uses its
+// own account, so the demo exercises the least-privilege split rather than a superuser.
+static async Task<int> PipelineAsync(Options o)
+{
+    var dialect = o.Require("db");
+    var schema = o.Require("schema");
+    var outDir = o.Require("out");
+    Directory.CreateDirectory(outDir);
+
+    var owner = Databases.Open(dialect, "KVKK_OWNER_CONNECTION");
+    var scanner = Databases.Open(dialect, "KVKK_SCANNER_CONNECTION");
+    var maskerDb = Databases.Open(dialect, "KVKK_MASKER_CONNECTION");
+
+    var loaded = await new SyntheticDataLoader(owner).LoadAsync(schema, ClinicSchema.Tables(), o.Int("rows", 500), grantSelectTo: "kvkk_read");
+    Console.Error.WriteLine($"[{dialect}] seeded {loaded.Rows} synthetic rows into {loaded.Tables} tables");
+
+    var scan = await new SchemaScanner(scanner, new DetectionEngine()).ScanAsync(schema);
+    var classification = Classifier.Classify(scan);
+    Write(Path.Combine(outDir, "scan.json"), JsonSerializer.Serialize(scan, KvkkJson.Options));
+    Write(Path.Combine(outDir, "classification.json"), JsonSerializer.Serialize(classification, KvkkJson.Options));
+    Console.Error.WriteLine(string.Create(CultureInfo.InvariantCulture,
+        $"[{dialect}] scanned {scan.Tables.Count} tables / {scan.ColumnCount} columns in {scan.DurationMs:F0} ms: {classification.Columns.Count} findings"));
+
+    var result = Evaluator.Evaluate(classification, ClinicSchema.Tables().GroundTruth());
+    Write(Path.Combine(outDir, "accuracy.md"), Evaluator.ToMarkdown(result));
+    Console.Error.WriteLine(string.Create(CultureInfo.InvariantCulture,
+        $"[{dialect}] accuracy vs ground truth: precision {result.Micro.Precision:F3}, recall {result.Micro.Recall:F3}, F1 {result.Micro.F1:F3}"));
+
+    WriteInventory(InventoryBuilder.Build(classification, InventoryPolicy.Load(o.Get("policy") ?? "samples/inventory-policy.json")), outDir);
+
+    var key = Environment.GetEnvironmentVariable("KVKK_MASKING_KEY") ?? throw new ArgumentException("Set KVKK_MASKING_KEY (base64, ≥ 32 bytes).");
+    var summary = await new MaskingRunner(maskerDb, Masker.FromBase64(key)).RunAsync(schema, o.Require("target"), MaskingPlan.From(classification));
+    Console.Error.WriteLine(string.Create(CultureInfo.InvariantCulture,
+        $"[{dialect}] masked copy {summary.SourceSchema} → {summary.TargetSchema}: {summary.Rows} rows in {summary.DurationMs:F0} ms"));
+    Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"PIPELINE_OK {dialect} f1={result.Micro.F1:F3} masked_rows={summary.Rows}"));
+    return 0;
+}
+
 static void WriteInventory(VerbisInventory inventory, string outDir)
 {
     Directory.CreateDirectory(outDir);
@@ -211,6 +251,7 @@ static int Usage()
           kvkk export   --classification F --policy inventory-policy.json --out DIR
           kvkk evaluate --classification F [--labels F] [--out F]
           kvkk demo     [--out docs/samples]           in-memory end-to-end run, writes the sample files
+          kvkk pipeline --db postgres|oracle --schema S --target T --out DIR   seed → scan → classify → export → mask (compose demo)
 
         Connection string: --conn-env NAME (default KVKK_CONNECTION). Passwords never go on the command line.
         """);

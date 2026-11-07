@@ -10,15 +10,15 @@ internal static class Databases
     /// <summary>Published, deliberately weak-in-practice key for the in-memory demo only. Never use it for real data.</summary>
     public const string DemoKey = "ZGVtby1rZXktZG8tbm90LXVzZS1mb3ItcmVhbC1kYXRhIQ==";
 
-    public static IRelationalDatabase Open(Options o)
+    public static IRelationalDatabase Open(Options o) => Open(o.Require("db"), o.Get("conn-env") ?? "KVKK_CONNECTION");
+
+    public static IRelationalDatabase Open(string dialect, string variable)
     {
-        var dialect = o.Require("db");
         if (dialect == "memory")
         {
             throw new ArgumentException("--db memory is only available through `kvkk demo`.");
         }
 
-        var variable = o.Get("conn-env") ?? "KVKK_CONNECTION";
         var connection = Environment.GetEnvironmentVariable(variable)
             ?? throw new ArgumentException($"Set the {variable} environment variable to the connection string.");
         return dialect switch
