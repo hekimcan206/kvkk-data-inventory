@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>kvkk</AssemblyName>
+    <RootNamespace>KvkkInventory.Cli</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KvkkInventory.Core\KvkkInventory.Core.csproj" />
+    <ProjectReference Include="..\KvkkInventory.Synthetic\KvkkInventory.Synthetic.csproj" />
+    <ProjectReference Include="..\KvkkInventory.Postgres\KvkkInventory.Postgres.csproj" />
+    <ProjectReference Include="..\KvkkInventory.Oracle\KvkkInventory.Oracle.csproj" />
+  </ItemGroup>
+
+</Project>

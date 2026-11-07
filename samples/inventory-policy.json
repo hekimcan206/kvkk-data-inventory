@@ -1,0 +1,137 @@
+{
+  "controller": "Örnek Klinik Sağlık Hizmetleri A.Ş. (synthetic example)",
+  "defaultSubjectGroup": "Diğer",
+  "subjectGroups": [
+    { "name": "Hasta", "tables": ["hastalar", "randevular", "tanilar", "receteler", "faturalar", "genetik_testler", "sosyal_degerlendirme"] },
+    { "name": "Çalışan", "tables": ["personel", "personel_izinleri", "audit_log"] },
+    { "name": "Online Portal Kullanıcısı", "tables": ["customers"] }
+  ],
+  "processing": {
+    "Hasta:identity": {
+      "purposes": ["Sağlık hizmetlerinin yürütülmesi", "Faaliyetlerin mevzuata uygun yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-ç (hukuki yükümlülük)", "KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "Son işlemden itibaren 20 yıl (illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları", "Özel sigorta şirketleri"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Hasta:contact": {
+      "purposes": ["İletişim faaliyetlerinin yürütülmesi", "Randevu hatırlatma"],
+      "legalBases": ["KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "Son işlemden itibaren 10 yıl (illustrative)",
+      "recipients": ["Tedarikçiler (SMS hizmet sağlayıcısı)"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Hasta:finance": {
+      "purposes": ["Finans ve muhasebe işlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-ç (hukuki yükümlülük)"],
+      "retention": "10 yıl (VUK ve TTK saklama süreleri, illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları", "Bankalar"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "health": {
+      "purposes": ["Tıbbi teşhis ve tedavi hizmetlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.6/3 (sır saklama yükümlülüğü altındaki kişilerce tıbbi teşhis ve tedavi)"],
+      "retention": "20 yıl (illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları (Sağlık Bakanlığı, SGK)"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "genetic": {
+      "purposes": ["Tıbbi teşhis ve tedavi hizmetlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.6/3"],
+      "retention": "20 yıl (illustrative)",
+      "recipients": ["Tedarikçiler (referans genetik laboratuvarı)"],
+      "foreignTransfer": { "planned": true, "countries": ["Almanya"] }
+    },
+    "Çalışan:identity": {
+      "purposes": ["Çalışanlar için iş akdi ve mevzuattan kaynaklı yükümlülüklerin yerine getirilmesi"],
+      "legalBases": ["KVKK m.5/2-ç (hukuki yükümlülük)", "KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "İş ilişkisinin sona ermesinden itibaren 10 yıl (illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları (SGK, İŞKUR)"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:contact": {
+      "purposes": ["İletişim faaliyetlerinin yürütülmesi", "Acil durum yönetimi süreçlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "İş ilişkisinin sona ermesinden itibaren 10 yıl (illustrative)",
+      "recipients": [],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:finance": {
+      "purposes": ["Ücret politikasının yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-ç (hukuki yükümlülük)"],
+      "retention": "10 yıl (illustrative)",
+      "recipients": ["Bankalar"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:personnel": {
+      "purposes": ["Ücret politikasının yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "10 yıl (illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları (Gelir İdaresi, SGK)"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:union": {
+      "purposes": ["Çalışanlar için iş akdi ve mevzuattan kaynaklı yükümlülüklerin yerine getirilmesi (sendika aidatı kesintisi)"],
+      "legalBases": ["KVKK m.6/3 (kanunlarda öngörülme — 6356 sayılı Kanun)"],
+      "retention": "Üyelik sona erdikten sonra 10 yıl (illustrative)",
+      "recipients": ["İlgili sendika"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:biometric": {
+      "purposes": ["Fiziksel mekân güvenliğinin temini (yüksek güvenlikli alan girişi)"],
+      "legalBases": ["KVKK m.6/3 (açık rıza)"],
+      "retention": "İş ilişkisinin sona ermesiyle derhal imha (illustrative)",
+      "recipients": [],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:criminal": {
+      "purposes": ["Çalışan adayı / çalışan seçme ve yerleştirme süreçlerinin yürütülmesi (yalnızca kanunen zorunlu pozisyonlar)"],
+      "legalBases": ["KVKK m.6/3 (kanunlarda öngörülme)"],
+      "retention": "İş ilişkisinin sona ermesinden itibaren 10 yıl (illustrative)",
+      "recipients": [],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:location": {
+      "purposes": ["Fiziksel mekân güvenliğinin temini (otopark girişi)"],
+      "legalBases": ["KVKK m.5/2-f (meşru menfaat)"],
+      "retention": "İş ilişkisinin sona ermesiyle imha (illustrative)",
+      "recipients": [],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Çalışan:transaction-security": {
+      "purposes": ["Bilgi güvenliği süreçlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-ç (5651 sayılı Kanun)", "KVKK m.5/2-f (meşru menfaat)"],
+      "retention": "2 yıl (illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Online Portal Kullanıcısı:identity": {
+      "purposes": ["Ürün / hizmetlerin satış süreçlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "Üyelik sona erdikten sonra 3 yıl (illustrative)",
+      "recipients": [],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Online Portal Kullanıcısı:contact": {
+      "purposes": ["İletişim faaliyetlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "Üyelik sona erdikten sonra 3 yıl (illustrative)",
+      "recipients": ["Tedarikçiler (e-posta hizmet sağlayıcısı)"],
+      "foreignTransfer": { "planned": true, "countries": ["İrlanda"] }
+    },
+    "Online Portal Kullanıcısı:finance": {
+      "purposes": ["Finans ve muhasebe işlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-c (sözleşmenin ifası)"],
+      "retention": "10 yıl (illustrative)",
+      "recipients": ["Ödeme kuruluşları"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    },
+    "Online Portal Kullanıcısı:transaction-security": {
+      "purposes": ["Bilgi güvenliği süreçlerinin yürütülmesi"],
+      "legalBases": ["KVKK m.5/2-ç (5651 sayılı Kanun)"],
+      "retention": "2 yıl (illustrative)",
+      "recipients": ["Yetkili kamu kurum ve kuruluşları"],
+      "foreignTransfer": { "planned": false, "countries": [] }
+    }
+  }
+}

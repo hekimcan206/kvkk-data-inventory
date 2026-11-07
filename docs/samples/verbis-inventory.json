@@ -1,0 +1,607 @@
+{
+  "controller": "Örnek Klinik Sağlık Hizmetleri A.Ş. (synthetic example)",
+  "dialect": "memory",
+  "schema": "clinic",
+  "generatedAt": "2026-11-07T00:47:51.9209698+00:00",
+  "entries": [
+    {
+      "subjectGroup": "Diğer",
+      "categoryCode": "contact",
+      "category": "İletişim",
+      "special": false,
+      "purposes": [],
+      "legalBases": [],
+      "retention": "",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "subeler.adres (Address)",
+        "subeler.telefon (Phone)"
+      ],
+      "policyMissing": true
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "belief",
+      "category": "Felsefi İnanç, Din, Mezhep ve Diğer İnançlar",
+      "special": true,
+      "purposes": [],
+      "legalBases": [],
+      "retention": "",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "sosyal_degerlendirme.mezhep (ReligionBelief)"
+      ],
+      "policyMissing": true
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "contact",
+      "category": "İletişim",
+      "special": false,
+      "purposes": [
+        "İletişim faaliyetlerinin yürütülmesi",
+        "Randevu hatırlatma"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "Son işlemden itibaren 10 yıl (illustrative)",
+      "recipients": [
+        "Tedarikçiler (SMS hizmet sağlayıcısı)"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "hastalar.adres (Address)",
+        "hastalar.cep_telefonu (Phone)",
+        "hastalar.eposta (Email)",
+        "randevular.notlar (Phone)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "ethnicity",
+      "category": "Irk ve Etnik Köken",
+      "special": true,
+      "purposes": [],
+      "legalBases": [],
+      "retention": "",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "sosyal_degerlendirme.etnik_koken (EthnicOrigin)"
+      ],
+      "policyMissing": true
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "finance",
+      "category": "Finans",
+      "special": false,
+      "purposes": [
+        "Finans ve muhasebe işlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-ç (hukuki yükümlülük)"
+      ],
+      "retention": "10 yıl (VUK ve TTK saklama süreleri, illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları",
+        "Bankalar"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "faturalar.odeme_karti (PaymentCard)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "genetic",
+      "category": "Genetik Veri",
+      "special": true,
+      "purposes": [
+        "Tıbbi teşhis ve tedavi hizmetlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.6/3"
+      ],
+      "retention": "20 yıl (illustrative)",
+      "recipients": [
+        "Tedarikçiler (referans genetik laboratuvarı)"
+      ],
+      "foreignTransfer": {
+        "planned": true,
+        "countries": [
+          "Almanya"
+        ]
+      },
+      "sources": [
+        "genetik_testler.dna_ornek_kodu (Genetic)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "health",
+      "category": "Sağlık Bilgileri",
+      "special": true,
+      "purposes": [
+        "Tıbbi teşhis ve tedavi hizmetlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.6/3 (sır saklama yükümlülüğü altındaki kişilerce tıbbi teşhis ve tedavi)"
+      ],
+      "retention": "20 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları (Sağlık Bakanlığı, SGK)"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "hastalar.kan_grubu (Health)",
+        "randevular.notlar (Health)",
+        "randevular.oda_no (Health)",
+        "tanilar.icd10_kodu (Health)",
+        "tanilar.tani_aciklamasi (Health)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "identity",
+      "category": "Kimlik",
+      "special": false,
+      "purposes": [
+        "Sağlık hizmetlerinin yürütülmesi",
+        "Faaliyetlerin mevzuata uygun yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-ç (hukuki yükümlülük)",
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "Son işlemden itibaren 20 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları",
+        "Özel sigorta şirketleri"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "faturalar.sigorta_vkn (TaxId)",
+        "hastalar.ad (PersonName)",
+        "hastalar.cinsiyet (Gender)",
+        "hastalar.dogum_tarihi (DateOfBirth)",
+        "hastalar.soyad (PersonName)",
+        "hastalar.tc_kimlik_no (NationalId)",
+        "randevular.doktor_adi (PersonName)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Hasta",
+      "categoryCode": "political",
+      "category": "Siyasi Düşünce",
+      "special": true,
+      "purposes": [],
+      "legalBases": [],
+      "retention": "",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "sosyal_degerlendirme.siyasi_gorus (PoliticalOpinion)"
+      ],
+      "policyMissing": true
+    },
+    {
+      "subjectGroup": "Online Portal Kullanıcısı",
+      "categoryCode": "contact",
+      "category": "İletişim",
+      "special": false,
+      "purposes": [
+        "İletişim faaliyetlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "Üyelik sona erdikten sonra 3 yıl (illustrative)",
+      "recipients": [
+        "Tedarikçiler (e-posta hizmet sağlayıcısı)"
+      ],
+      "foreignTransfer": {
+        "planned": true,
+        "countries": [
+          "İrlanda"
+        ]
+      },
+      "sources": [
+        "customers.email_address (Email)",
+        "customers.phone_number (Phone)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Online Portal Kullanıcısı",
+      "categoryCode": "finance",
+      "category": "Finans",
+      "special": false,
+      "purposes": [
+        "Finans ve muhasebe işlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "10 yıl (illustrative)",
+      "recipients": [
+        "Ödeme kuruluşları"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "customers.card_number (PaymentCard)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Online Portal Kullanıcısı",
+      "categoryCode": "identity",
+      "category": "Kimlik",
+      "special": false,
+      "purposes": [
+        "Ürün / hizmetlerin satış süreçlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "Üyelik sona erdikten sonra 3 yıl (illustrative)",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "customers.full_name (PersonName)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Online Portal Kullanıcısı",
+      "categoryCode": "transaction-security",
+      "category": "İşlem Güvenliği",
+      "special": false,
+      "purposes": [
+        "Bilgi güvenliği süreçlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-ç (5651 sayılı Kanun)"
+      ],
+      "retention": "2 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "customers.last_login_ip (IpAddress)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "association",
+      "category": "Dernek Üyeliği",
+      "special": true,
+      "purposes": [],
+      "legalBases": [],
+      "retention": "",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.dernek_uyelikleri (AssociationMembership)"
+      ],
+      "policyMissing": true
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "belief",
+      "category": "Felsefi İnanç, Din, Mezhep ve Diğer İnançlar",
+      "special": true,
+      "purposes": [],
+      "legalBases": [],
+      "retention": "",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.din (ReligionBelief)"
+      ],
+      "policyMissing": true
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "biometric",
+      "category": "Biyometrik Veri",
+      "special": true,
+      "purposes": [
+        "Fiziksel mekân güvenliğinin temini (yüksek güvenlikli alan girişi)"
+      ],
+      "legalBases": [
+        "KVKK m.6/3 (açık rıza)"
+      ],
+      "retention": "İş ilişkisinin sona ermesiyle derhal imha (illustrative)",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.parmak_izi_sablonu (Biometric)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "contact",
+      "category": "İletişim",
+      "special": false,
+      "purposes": [
+        "İletişim faaliyetlerinin yürütülmesi",
+        "Acil durum yönetimi süreçlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "İş ilişkisinin sona ermesinden itibaren 10 yıl (illustrative)",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.acil_durum_tel (Phone)",
+        "personel.email (Email)",
+        "personel.gsm (Phone)",
+        "personel.ikamet_adresi (Address)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "criminal",
+      "category": "Ceza Mahkûmiyeti ve Güvenlik Tedbirleri",
+      "special": true,
+      "purposes": [
+        "Çalışan adayı / çalışan seçme ve yerleştirme süreçlerinin yürütülmesi (yalnızca kanunen zorunlu pozisyonlar)"
+      ],
+      "legalBases": [
+        "KVKK m.6/3 (kanunlarda öngörülme)"
+      ],
+      "retention": "İş ilişkisinin sona ermesinden itibaren 10 yıl (illustrative)",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.sabika_kaydi (CriminalRecord)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "finance",
+      "category": "Finans",
+      "special": false,
+      "purposes": [
+        "Ücret politikasının yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-ç (hukuki yükümlülük)"
+      ],
+      "retention": "10 yıl (illustrative)",
+      "recipients": [
+        "Bankalar"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.iban (Iban)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "health",
+      "category": "Sağlık Bilgileri",
+      "special": true,
+      "purposes": [
+        "Tıbbi teşhis ve tedavi hizmetlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.6/3 (sır saklama yükümlülüğü altındaki kişilerce tıbbi teşhis ve tedavi)"
+      ],
+      "retention": "20 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları (Sağlık Bakanlığı, SGK)"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.engel_durumu (Health)",
+        "personel.kan_grubu (Health)",
+        "personel_izinleri.rapor_tani_kodu (Health)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "identity",
+      "category": "Kimlik",
+      "special": false,
+      "purposes": [
+        "Çalışanlar için iş akdi ve mevzuattan kaynaklı yükümlülüklerin yerine getirilmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-ç (hukuki yükümlülük)",
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "İş ilişkisinin sona ermesinden itibaren 10 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları (SGK, İŞKUR)"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.acil_durum_kisi (PersonName)",
+        "personel.ad_soyad (PersonName)",
+        "personel.birth_date (DateOfBirth)",
+        "personel.gender (Gender)",
+        "personel.tckn (NationalId)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "location",
+      "category": "Lokasyon",
+      "special": false,
+      "purposes": [
+        "Fiziksel mekân güvenliğinin temini (otopark girişi)"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-f (meşru menfaat)"
+      ],
+      "retention": "İş ilişkisinin sona ermesiyle imha (illustrative)",
+      "recipients": [],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.arac_plakasi (VehiclePlate)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "personnel",
+      "category": "Özlük",
+      "special": false,
+      "purposes": [
+        "Ücret politikasının yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-c (sözleşmenin ifası)"
+      ],
+      "retention": "10 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları (Gelir İdaresi, SGK)"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.maas (Salary)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "transaction-security",
+      "category": "İşlem Güvenliği",
+      "special": false,
+      "purposes": [
+        "Bilgi güvenliği süreçlerinin yürütülmesi"
+      ],
+      "legalBases": [
+        "KVKK m.5/2-ç (5651 sayılı Kanun)",
+        "KVKK m.5/2-f (meşru menfaat)"
+      ],
+      "retention": "2 yıl (illustrative)",
+      "recipients": [
+        "Yetkili kamu kurum ve kuruluşları"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "audit_log.ip_adresi (IpAddress)"
+      ],
+      "policyMissing": false
+    },
+    {
+      "subjectGroup": "Çalışan",
+      "categoryCode": "union",
+      "category": "Sendika Üyeliği",
+      "special": true,
+      "purposes": [
+        "Çalışanlar için iş akdi ve mevzuattan kaynaklı yükümlülüklerin yerine getirilmesi (sendika aidatı kesintisi)"
+      ],
+      "legalBases": [
+        "KVKK m.6/3 (kanunlarda öngörülme — 6356 sayılı Kanun)"
+      ],
+      "retention": "Üyelik sona erdikten sonra 10 yıl (illustrative)",
+      "recipients": [
+        "İlgili sendika"
+      ],
+      "foreignTransfer": {
+        "planned": false,
+        "countries": []
+      },
+      "sources": [
+        "personel.sendika_uyeligi (UnionMembership)"
+      ],
+      "policyMissing": false
+    }
+  ],
+  "gaps": [
+    "Diğer / İletişim: found in 2 column(s) but no purpose, legal basis or retention period is documented.",
+    "Tables without a data subject group: subeler.",
+    "Hasta / Felsefi İnanç, Din, Mezhep ve Diğer İnançlar: found in 1 column(s) but no purpose, legal basis or retention period is documented.",
+    "Hasta / Irk ve Etnik Köken: found in 1 column(s) but no purpose, legal basis or retention period is documented.",
+    "Hasta / Siyasi Düşünce: found in 1 column(s) but no purpose, legal basis or retention period is documented.",
+    "Çalışan / Dernek Üyeliği: found in 1 column(s) but no purpose, legal basis or retention period is documented.",
+    "Çalışan / Felsefi İnanç, Din, Mezhep ve Diğer İnançlar: found in 1 column(s) but no purpose, legal basis or retention period is documented."
+  ]
+}
