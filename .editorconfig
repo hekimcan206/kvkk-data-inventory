@@ -72,3 +72,5 @@ dotnet_diagnostic.IDE0005.severity = none
 dotnet_diagnostic.CA1707.severity = none
 # Tests may intentionally pass literal strings / unused results.
 dotnet_diagnostic.CA1515.severity = none
+# Constant arrays inline in a test read better than static fields.
+dotnet_diagnostic.CA1861.severity = none

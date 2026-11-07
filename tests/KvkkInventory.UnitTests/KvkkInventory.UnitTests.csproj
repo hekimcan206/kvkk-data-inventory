@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\KvkkInventory.Core\KvkkInventory.Core.csproj" />
     <ProjectReference Include="..\..\src\KvkkInventory.Synthetic\KvkkInventory.Synthetic.csproj" />
+    <ProjectReference Include="..\..\src\KvkkInventory.Api\KvkkInventory.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
