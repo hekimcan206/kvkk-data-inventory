@@ -270,8 +270,10 @@ public sealed class Masker
             case PiiType.PersonName:
             {
                 var words = value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+                // A single word is a first name or a surname (separate ad / soyad columns); keep which one it was.
+                var single = Lexicons.Surnames.Contains(TurkishText.Fold(value.Trim())) ? Surnames : FirstNames;
                 var name = words <= 1
-                    ? Capitalise(FirstNames[prf.Next(FirstNames.Length)])
+                    ? Capitalise(single[prf.Next(single.Length)])
                     : Capitalise(FirstNames[prf.Next(FirstNames.Length)]) + " " + Capitalise(Surnames[prf.Next(Surnames.Length)]);
                 return value.Any(char.IsLower) ? name : name.ToUpperInvariant();
             }
