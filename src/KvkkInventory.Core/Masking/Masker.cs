@@ -65,6 +65,14 @@ public sealed class Masker
             return strategy == MaskingStrategy.Generalize ? new DateTime(date.Year, 1, 1, 0, 0, 0, date.Kind) : ShiftDate(date);
         }
 
+        // Npgsql returns PostgreSQL `date` as DateOnly; Oracle DATE arrives as DateTime. Both mask the same way.
+        if (value is DateOnly day && type == PiiType.DateOfBirth)
+        {
+            return strategy == MaskingStrategy.Generalize
+                ? new DateOnly(day.Year, 1, 1)
+                : DateOnly.FromDateTime(ShiftDate(day.ToDateTime(TimeOnly.MinValue)));
+        }
+
         if (value is byte[])
         {
             return null;
@@ -432,6 +440,7 @@ public sealed class Masker
         int => int.TryParse(masked, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : null,
         double => double.TryParse(masked, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : null,
         DateTime => DateTime.TryParse(masked, CultureInfo.InvariantCulture, DateTimeStyles.None, out var t) ? t : null,
+        DateOnly => DateOnly.TryParse(masked, CultureInfo.InvariantCulture, DateTimeStyles.None, out var day) ? day : null,
         // A masked value that no longer fits the column type is dropped rather than half-masked.
         _ => null,
     };
